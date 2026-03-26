@@ -20,7 +20,8 @@ function loadData() {
 
       document.getElementById("time").innerText =
         "Last Updated: " + data.timestamp;
-    });
+    })
+    .catch(error => console.error("Error loading data:", error));
 }
 
 loadData();
