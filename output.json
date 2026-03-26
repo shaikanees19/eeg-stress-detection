@@ -1,8 +1,0 @@
-{
-  "stress_label": "LOW / NO STRESS",
-  "stress_percentage": 25,
-  "relative_alpha": 0.3,
-  "relative_beta": 0.2,
-  "relative_theta": 0.5,
-  "timestamp": "Initial Load"
-}
