@@ -1,8 +1,18 @@
-{
-  "stress_label": "LOW / NO STRESS",
-  "stress_percentage": 25,
-  "relative_alpha": 0.3,
-  "relative_beta": 0.2,
-  "relative_theta": 0.5,
-  "timestamp": "Initial Load"
-}
+timestamp = datestr(now);
+
+data = struct( ...
+    'stress_label', stress_label, ...
+    'stress_percentage', round(stress_percentage, 2), ...
+    'relative_alpha', round(rel_alpha, 4), ...
+    'relative_beta', round(rel_beta, 4), ...
+    'relative_theta', round(rel_theta, 4), ...
+    'timestamp', timestamp ...
+);
+
+jsonStr = jsonencode(data);
+
+fid = fopen('output.json', 'w');
+fprintf(fid, '%s', jsonStr);
+fclose(fid);
+
+disp('output.json created');
