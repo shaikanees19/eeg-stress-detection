@@ -1,19 +1,18 @@
 
-timestamp = datestr(now);
-
-data = struct( ...
-    'stress_label', stress_label, ...
-    'stress_percentage', round(stress_percentage, 2), ...
-    'relative_alpha', round(rel_alpha, 4), ...
-    'relative_beta', round(rel_beta, 4), ...
-    'relative_theta', round(rel_theta, 4), ...
-    'timestamp', timestamp ...
-);
-
-jsonStr = jsonencode(data);
-
-fid = fopen('output.json', 'w');
-fprintf(fid, '%s', jsonStr);
-fclose(fid);
-
-disp('output.json created');
+{
+  "delta_power": 38.0297,
+  "theta_power": 15.1647,
+  "alpha_power": 7.336,
+  "beta_power": 2.8379,
+  "gamma_power": 0.0366,
+  "relative_delta": 0.5998,
+  "relative_theta": 0.2392,
+  "relative_alpha": 0.1157,
+  "relative_beta": 0.0448,
+  "relative_gamma": 0.0006,
+  "beta_alpha_ratio": 0.3868,
+  "beta_alpha_theta_ratio": 0.1261,
+  "stress_percentage": 10.65,
+  "stress_label": "LOW / NO STRESS",
+  "timestamp": "2026-03-27 12:00:00"
+}
