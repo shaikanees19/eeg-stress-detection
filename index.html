@@ -1,108 +1,169 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>EEG Stress Monitor</title>
-    <meta charset="UTF-8">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        body {
-            font-family: Arial;
-            text-align: center;
-            background: #0f172a;
-            color: white;
-        }
-
-        .card {
-            background: #1e293b;
-            padding: 20px;
-            margin: 20px auto;
-            width: 300px;
-            border-radius: 12px;
-        }
-
-        h1 { color: #38bdf8; }
-        h2 { color: #38bdf8; }
-
-        .big {
-            font-size: 28px;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EEG Stress Monitoring System</title>
+ 
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+ 
+  <!-- Your stylesheet -->
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
-
-<h1>🧠 EEG Stress Monitoring System</h1>
-
-<div class="card">
-    <h2>Stress Level</h2>
-    <p class="big" id="stress">--%</p>
-    <p id="label">--</p>
-</div>
-
-<div class="card">
-    <h2>Brain Waves</h2>
-    <p>Alpha: <span id="alpha">--</span></p>
-    <p>Beta: <span id="beta">--</span></p>
-    <p>Theta: <span id="theta">--</span></p>
-</div>
-
-<div class="card">
-    <h2>Live Chart</h2>
-    <canvas id="chart"></canvas>
-</div>
-
-<script>
-let chart;
-
-async function loadEEGData() {
-    try {
-        const response = await fetch(
-            "https://raw.githubusercontent.com/shaikanees19/eeg-stress-detection/main/output.json?t=" + new Date().getTime()
-        );
-
-        const data = await response.json();
-
-        // Update UI
-        document.getElementById("stress").innerText = data.stress_percentage + "%";
-        document.getElementById("label").innerText = data.stress_label;
-        document.getElementById("alpha").innerText = data.relative_alpha;
-        document.getElementById("beta").innerText = data.relative_beta;
-        document.getElementById("theta").innerText = data.relative_theta;
-
-        // Chart data
-        const chartData = [
-            data.relative_alpha,
-            data.relative_beta,
-            data.relative_theta
-        ];
-
-        if (chart) {
-            chart.data.datasets[0].data = chartData;
-            chart.update();
-        } else {
-            chart = new Chart(document.getElementById("chart"), {
-                type: 'bar',
-                data: {
-                    labels: ['Alpha', 'Beta', 'Theta'],
-                    datasets: [{
-                        label: 'Relative Power',
-                        data: chartData
-                    }]
-                }
-            });
-        }
-
-    } catch (error) {
-        console.error("Error loading data:", error);
-    }
-}
-
-// Auto refresh every 5 seconds
-setInterval(loadEEGData, 5000);
-loadEEGData();
-</script>
-
+ 
+  <!-- ══════════════════════════════════════
+       HEADER
+  ══════════════════════════════════════ -->
+  <header>
+    <span class="header-brain">🧠</span>
+    <h1>EEG Stress Monitoring System</h1>
+    <p class="subtitle">Real-time neural band analysis · GitHub live feed</p>
+  </header>
+ 
+  <!-- ══════════════════════════════════════
+       ERROR BANNER (hidden by default)
+  ══════════════════════════════════════ -->
+  <div id="errorBanner">
+    ⚠️ Cannot reach GitHub data. Check repo name, token, or internet connection.
+  </div>
+ 
+  <!-- ══════════════════════════════════════
+       DASHBOARD GRID
+  ══════════════════════════════════════ -->
+  <div class="grid">
+ 
+    <!-- ① Stress Level -->
+    <div class="card">
+      <h2><i class="icon">📊</i> Stress Level</h2>
+      <div class="stress-value" id="stressNum">--%</div>
+      <div class="stress-tag"  id="stressTag">Waiting for data…</div>
+      <div class="stress-bar-track">
+        <div class="stress-bar-fill" id="stressFill"></div>
+      </div>
+    </div>
+ 
+    <!-- ② Final Decision -->
+    <div class="card">
+      <h2><i class="icon">🎯</i> Final Decision</h2>
+      <div class="decision-panel" id="decisionBox">
+        <div class="decision-state" id="decisionState">--</div>
+        <div class="decision-pct">
+          Stress Percentage: <span id="decisionPctSpan">--%</span>
+        </div>
+      </div>
+      <div style="text-align:center">
+        <div class="live-pill">
+          <div class="live-dot"></div>
+          Live · refreshes every 5 s
+        </div>
+      </div>
+    </div>
+ 
+    <!-- ③ EEG Band Powers -->
+    <div class="card">
+      <h2><i class="icon">⚡</i> EEG Band Powers</h2>
+ 
+      <div class="band-row">
+        <span class="band-name">
+          <span class="dot" style="background:#6366f1"></span>Delta
+        </span>
+        <span class="band-val" id="bDelta">--</span>
+      </div>
+ 
+      <div class="band-row">
+        <span class="band-name">
+          <span class="dot" style="background:#8b5cf6"></span>Theta
+        </span>
+        <span class="band-val" id="bTheta">--</span>
+      </div>
+ 
+      <div class="band-row">
+        <span class="band-name">
+          <span class="dot" style="background:#06b6d4"></span>Alpha
+        </span>
+        <span class="band-val" id="bAlpha">--</span>
+      </div>
+ 
+      <div class="band-row">
+        <span class="band-name">
+          <span class="dot" style="background:#f59e0b"></span>Beta
+        </span>
+        <span class="band-val" id="bBeta">--</span>
+      </div>
+ 
+      <div class="band-row">
+        <span class="band-name">
+          <span class="dot" style="background:#ef4444"></span>Gamma
+        </span>
+        <span class="band-val" id="bGamma">--</span>
+      </div>
+    </div>
+ 
+    <!-- ④ Stress Indices -->
+    <div class="card">
+      <h2><i class="icon">🔬</i> Stress Indices</h2>
+ 
+      <div class="index-tile">
+        <div class="index-label">Beta / Alpha Ratio</div>
+        <div class="index-val" id="idxBA">--</div>
+      </div>
+ 
+      <div class="index-tile">
+        <div class="index-label">Beta / (Alpha + Theta) Ratio</div>
+        <div class="index-val" id="idxBAT">--</div>
+      </div>
+    </div>
+ 
+    <!-- ⑤ Relative Powers (full width) -->
+    <div class="card full">
+      <h2><i class="icon">📡</i> Relative Powers</h2>
+ 
+      <div class="rel-row">
+        <span class="rel-label">Delta</span>
+        <div class="rel-track"><div class="rel-fill fill-delta" id="rDeltaBar"></div></div>
+        <span class="rel-val" id="rDelta">--</span>
+      </div>
+ 
+      <div class="rel-row">
+        <span class="rel-label">Theta</span>
+        <div class="rel-track"><div class="rel-fill fill-theta" id="rThetaBar"></div></div>
+        <span class="rel-val" id="rTheta">--</span>
+      </div>
+ 
+      <div class="rel-row">
+        <span class="rel-label">Alpha</span>
+        <div class="rel-track"><div class="rel-fill fill-alpha" id="rAlphaBar"></div></div>
+        <span class="rel-val" id="rAlpha">--</span>
+      </div>
+ 
+      <div class="rel-row">
+        <span class="rel-label">Beta</span>
+        <div class="rel-track"><div class="rel-fill fill-beta"  id="rBetaBar"></div></div>
+        <span class="rel-val" id="rBeta">--</span>
+      </div>
+ 
+      <div class="rel-row">
+        <span class="rel-label">Gamma</span>
+        <div class="rel-track"><div class="rel-fill fill-gamma" id="rGammaBar"></div></div>
+        <span class="rel-val" id="rGamma">--</span>
+      </div>
+    </div>
+ 
+    <!-- ⑥ Live Chart (full width) -->
+    <div class="card full">
+      <h2><i class="icon">📈</i> Live Chart — Relative Band Powers</h2>
+      <canvas id="chart"></canvas>
+    </div>
+ 
+  </div><!-- /grid -->
+ 
+  <!-- Status bar -->
+  <div class="status-bar" id="statusBar">⏳ Initialising…</div>
+ 
+  <!-- Your script -->
+  <script src="script.js"></script>
+ 
 </body>
 </html>
