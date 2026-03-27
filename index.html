@@ -1,27 +1,106 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>EEG Stress Detection</title>
-  <link rel="stylesheet" href="style.css">
+    <title>EEG Stress Monitor</title>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: #0f172a;
+            color: white;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 20px;
+            margin: 20px auto;
+            width: 300px;
+            border-radius: 12px;
+        }
+
+        h2 {
+            color: #38bdf8;
+        }
+
+        .big {
+            font-size: 28px;
+            font-weight: bold;
+        }
+    </style>
 </head>
+
 <body>
 
-<h1>🧠 EEG Stress Level Detection</h1>
+    <h1>🧠 EEG Stress Monitoring System</h1>
 
-<div class="card">
-  <h2 id="stress">Loading...</h2>
-  <p id="percentage"></p>
-  <p id="time"></p>
-</div>
+    <div class="card">
+        <h2>Stress Level</h2>
+        <p class="big" id="stress">--%</p>
+        <p id="label">--</p>
+    </div>
 
-<div class="card">
-  <h3>EEG Features</h3>
-  <p id="alpha"></p>
-  <p id="beta"></p>
-  <p id="theta"></p>
-</div>
+    <div class="card">
+        <h2>Brain Waves</h2>
+        <p>Alpha: <span id="alpha">--</span></p>
+        <p>Beta: <span id="beta">--</span></p>
+        <p>Theta: <span id="theta">--</span></p>
+    </div>
 
-<script src="script.js"></script>
+    <div class="card">
+        <h2>Live Chart</h2>
+        <canvas id="chart"></canvas>
+    </div>
+
+<script>
+let chart;
+
+async function loadEEGData() {
+    try {
+        const response = await fetch("https://raw.githubusercontent.com/shaikanees19/eeg-stress-detection/main/output.json");
+        const data = await response.json();
+
+        // Update values
+        document.getElementById("stress").innerText = data.stress_percentage + "%";
+        document.getElementById("label").innerText = data.stress_label;
+        document.getElementById("alpha").innerText = data.relative_alpha;
+        document.getElementById("beta").innerText = data.relative_beta;
+        document.getElementById("theta").innerText = data.relative_theta;
+
+        // Draw chart
+        const chartData = [
+            data.relative_alpha,
+            data.relative_beta,
+            data.relative_theta
+        ];
+
+        if (chart) {
+            chart.data.datasets[0].data = chartData;
+            chart.update();
+        } else {
+            chart = new Chart(document.getElementById("chart"), {
+                type: 'bar',
+                data: {
+                    labels: ['Alpha', 'Beta', 'Theta'],
+                    datasets: [{
+                        label: 'Relative Power',
+                        data: chartData
+                    }]
+                }
+            });
+        }
+
+    } catch (error) {
+        console.error("Error loading data:", error);
+    }
+}
+
+// Refresh every 5 sec
+setInterval(loadEEGData, 5000);
+loadEEGData();
+</script>
 
 </body>
 </html>
